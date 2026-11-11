@@ -1,0 +1,6 @@
+name = "pito-ai"
+main = "src/index.js"
+compatibility_date = "2026-11-11"
+
+[ai]
+binding = "AI"
