@@ -1,10 +1,7 @@
 
+
 export default {
   async fetch(request, env) {
-    const cors = {
-      "Content-Type": "application/json",
-    };
-
     if (request.method === "GET") {
       return new Response(`<!DOCTYPE html>
 <html lang="id">
@@ -28,14 +25,9 @@ button{padding:14px;background:#7965ff;color:white;border:0;border-radius:12px}
 </style>
 </head>
 <body>
-<header>
-<h2>✦ PITO AI</h2>
-<small>Your Ultimate AI Assistant</small>
-</header>
+<header><h2>✦ PITO AI</h2><small>Your Ultimate AI Assistant</small></header>
 <main>
-<div id="chat">
-<div class="msg ai">Halo! 👋 Aku PITO AI. Ada yang bisa kubantu?</div>
-</div>
+<div id="chat"><div class="msg ai">Halo! 👋 Aku PITO AI. Ada yang bisa kubantu?</div></div>
 <div class="bottom">
 <input id="input" placeholder="Tanyakan sesuatu..." />
 <button id="send">Kirim</button>
@@ -45,7 +37,14 @@ button{padding:14px;background:#7965ff;color:white;border:0;border-radius:12px}
 const input=document.getElementById("input");
 const chat=document.getElementById("chat");
 const send=document.getElementById("send");
-
+function add(text,type){
+ const div=document.createElement("div");
+ div.className="msg "+type;
+ div.textContent=text;
+ chat.appendChild(div);
+ chat.scrollTop=chat.scrollHeight;
+ return div;
+}
 async function ask(){
  const message=input.value.trim();
  if(!message)return;
@@ -65,20 +64,9 @@ async function ask(){
   loading.textContent="Koneksi bermasalah.";
  }
  send.disabled=false;
- chat.scrollTop=chat.scrollHeight;
-}
-function add(text,type){
- const div=document.createElement("div");
- div.className="msg "+type;
- div.textContent=text;
- chat.appendChild(div);
- chat.scrollTop=chat.scrollHeight;
- return div;
 }
 send.onclick=ask;
-input.addEventListener("keydown",e=>{
- if(e.key==="Enter")ask();
-});
+input.addEventListener("keydown",e=>{if(e.key==="Enter")ask();});
 </script>
 </body>
 </html>`, {
@@ -106,19 +94,22 @@ input.addEventListener("keydown",e=>{
                 role: "system",
                 content: "Kamu adalah PITO AI, asisten AI yang ramah, pintar, dan menjawab dalam bahasa pengguna."
               },
-              {
-                role: "user",
-                content: message
-              }
+              { role: "user", content: message }
             ]
           }
         );
 
-        return Response.json({ reply: result.response || "Tidak ada jawaban." });
-      } } catch (error) {
-  console.error("PITO AI ERROR:", error);
+        return Response.json({
+          reply: result.response || "Tidak ada jawaban."
+        });
+      } catch (error) {
+        console.error("PITO AI ERROR:", error);
+        return Response.json({
+          error: "AI gagal menjawab. Periksa log Cloudflare."
+        }, { status: 500 });
+      }
+    }
 
-  return Response.json({
-    error: "AI gagal menjawab. Periksa log Cloudflare."
-  }, { status: 500 });
-}
+    return new Response("Method not allowed", { status: 405 });
+  }
+};
