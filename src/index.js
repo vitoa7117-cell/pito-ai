@@ -115,13 +115,10 @@ input.addEventListener("keydown",e=>{
         );
 
         return Response.json({ reply: result.response || "Tidak ada jawaban." });
-      } catch (error) {
-        return Response.json({
-          error: "AI sedang bermasalah. Coba lagi nanti."
-        }, { status: 500 });
-      }
-    }
+      } } catch (error) {
+  console.error("PITO AI ERROR:", error);
 
-    return new Response("Method not allowed", { status: 405 });
-  }
-};
+  return Response.json({
+    error: "AI gagal menjawab. Periksa log Cloudflare."
+  }, { status: 500 });
+}
